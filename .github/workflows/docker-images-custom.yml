@@ -43,6 +43,11 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch }}
 
+      - name: Set lowercase repo
+        id: vars
+        run: |
+          echo "LOWER_REPO=$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
       - name: Merge Master - optionally
         if: github.event.inputs.merge-master
         run: git remote add upstream https://github.com/n8n-io/n8n.git -f; git merge upstream/master --allow-unrelated-histories || echo ""
@@ -75,7 +80,7 @@ jobs:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: ghcr.io/${{ github.repository_owner }}/n8n:${{ inputs.tag }}
+          tags: ghcr.io/${{ steps.vars.outputs.LOWER_REPO }}:latest
 
       - name: Call Success URL - optionally
         if: ${{ github.event.inputs.success-url != '' }}
